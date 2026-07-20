@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EMS - Leave Management</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50">
+  <div class="text-center mt-6 mb-6">
+
+    <img src="images/logo.jpeg"
+         alt="EMS Logo"
+         class="w-20 h-20 mx-auto rounded-full shadow-lg">
+
+    <h1 class="text-4xl font-bold text-indigo-700 mt-3">
+        Employee Management System
+    </h1>
+
+</div>
+<script>
+    if(localStorage.getItem('ems_auth')!== 'true' &&!window.location.pathname.includes('index.html')) {
+      window.location.href = 'index.html';
+    }
+    const user = JSON.parse(localStorage.getItem('ems_user') || '{}');
+</script>
+
+<div class="flex min-h-screen">
+    <div id="overlay" class="hidden lg:hidden fixed inset-0 bg-black/50 z-40" onclick="toggleSidebar()"></div>
+    <div id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 transform -translate-x-full lg:translate-x-0 transition duration-300">
+      <div class="p-6 border-b border-slate-700">
+        <h2 class="text-2xl font-bold text-white">EMS</h2>
+        <p class="text-slate-400 text-sm">Employee System</p>
+      </div>
+      <nav class="p-4 space-y-2">
+        <a href="dashboard.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-slate-800">📊 Dashboard</a>
+        <a href="attendance.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-slate-800">⏰ Attendance</a>
+        <a href="leave.html" class="flex items-center gap-3 px-4 py-3 rounded-xl bg-indigo-600 text-white">📅 Leave</a>
+        <a href="employee.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-slate-800">👥 Employee</a>
+        <button onclick="logout()" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-400 hover:bg-slate-800 mt-8">🚪 Logout</button>
+      </nav>
+    </div>
+
+    <div class="flex-1 lg:ml-64">
+      <div class="topbar px-4 sm:px-8 py-4 bg-white shadow-sm flex justify-between items-center">
+        <div class="flex items-center gap-4">
+          <button onclick="toggleSidebar()" class="lg:hidden p-2 bg-indigo-600 text-white rounded-lg">☰</button>
+          <h2 class="text-xl sm:text-2xl font-bold text-slate-800">Leave Management</h2>
+        </div>
+        <span class="text-sm sm:text-base text-slate-600">Welcome, <span id="userName">Admin</span></span>
+      </div>
+
+      <div class="p-4 sm:p-8">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+          <h1 class="text-2xl sm:text-3xl font-bold text-slate-800">Leave Requests</h1>
+          <button onclick="openLeaveModal()" class="w-full sm:w-auto px-6 py-3 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 transition shadow-lg hover:scale-105">
+            + Apply Leave
+          </button>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full min-w-[600px]">
+              <thead class="bg-slate-50">
+                <tr>
+                  <th class="px-6 py-4 text-left text-sm font-semibold text-slate-600">Emp ID</th>
+                  <th class="px-6 py-4 text-left text-sm font-semibold text-slate-600">Name</th>
+                  <th class="px-6 py-4 text-left text-sm font-semibold text-slate-600">Leave Type</th>
+                  <th class="px-6 py-4 text-left text-sm font-semibold text-slate-600">From</th>
+                  <th class="px-6 py-4 text-left text-sm font-semibold text-slate-600">To</th>
+                  <th class="px-6 py-4 text-left text-sm font-semibold text-slate-600">Status</th>
+                </tr>
+              </thead>
+              <tbody id="leaveTable" class="divide-y divide-slate-200"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Apply Leave Modal Popup -->
+  <div id="leaveModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-xl font-bold text-slate-800">Apply Leave</h3>
+        <button onclick="closeLeaveModal()" class="text-slate-400 hover:text-slate-600 text-2xl">×</button>
+      </div>
+
+      <form id="leaveForm" class="space-y-4">
+        <div>
+          <label class="text-sm font-medium text-slate-700 mb-1 block">Employee</label>
+          <select id="leaveEmp" class="w-full px-4 py-3 border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-600" required>
+            <option value="">Select Employee</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="text-sm font-medium text-slate-700 mb-1 block">Leave Type</label>
+          <select id="leaveType" class="w-full px-4 py-3 border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-600" required>
+            <option value="">Select Type</option>
+            <option>Casual Leave</option>
+            <option>Sick Leave</option>
+            <option>Annual Leave</option>
+            <option>Work From Home</option>
+          </select>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="text-sm font-medium text-slate-700 mb-1 block">From Date</label>
+            <input type="date" id="fromDate" class="w-full px-4 py-3 border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-600" required />
+          </div>
+          <div>
+            <label class="text-sm font-medium text-slate-700 mb-1 block">To Date</label>
+            <input type="date" id="toDate" class="w-full px-4 py-3 border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-600" required />
+          </div>
+        </div>
+
+        <div>
+          <label class="text-sm font-medium text-slate-700 mb-1 block">Reason</label>
+          <textarea id="reason" placeholder="Reason for leave..." class="w-full px-4 py-3 border-slate-300 rounded-xl h-24 resize-none focus:ring-2 focus:ring-indigo-600" required></textarea>
+        </div>
+
+        <div class="flex gap-3 mt-6">
+          <button type="button" onclick="closeLeaveModal()" class="flex-1 py-3 bg-slate-200 text-slate-700 rounded-xl font-semibold hover:bg-slate-300">Cancel</button>
+          <button type="submit" class="flex-1 py-3 bg-indigo-600 text-white rounded-xl font-semibold hover:bg-indigo-700 shadow-lg">Submit Request</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="toast" class="hidden fixed top-5 right-5 px-6 py-3 rounded-xl shadow-lg text-white font-semibold z-50"></div>
+
+  <script>
+const API_URL = "http://localhost:5000/api";
+
+// Date format panna function
+function formatDate(isoString){
+    if(!isoString) return '-';
+    const date = new Date(isoString);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}-${month}-${year}`;
+}
+
+function openLeaveModal() {
+    document.getElementById("leaveModal").classList.remove("hidden");
+    loadEmployeesForDropdown();
+}
+function closeLeaveModal() {
+    document.getElementById("leaveModal").classList.add("hidden");
+    document.getElementById("leaveForm").reset();
+}
+function toggleSidebar() {
+    document.getElementById("sidebar").classList.toggle("-translate-x-full");
+    document.getElementById("overlay").classList.toggle("hidden");
+}
+function logout() {
+    localStorage.removeItem("ems_auth");
+    localStorage.removeItem("ems_user");
+    window.location.href = "index.html";
+}
+
+function showToast(message, type='success') {
+    const toast = document.getElementById("toast");
+    toast.textContent = message;
+    toast.className = `fixed top-5 right-5 px-6 py-3 rounded-xl shadow-lg text-white font-semibold z-50 ${type==='success'?'bg-green-500':'bg-red-500'}`;
+    toast.classList.remove("hidden");
+    setTimeout(() => toast.classList.add("hidden"), 3000);
+}
+
+// Employee dropdown load
+async function loadEmployeesForDropdown() {
+    try {
+        const res = await fetch(`${API_URL}/employees`);
+        const result = await res.json();
+        const select = document.getElementById("leaveEmp");
+        select.innerHTML = `<option value="">Select Employee</option>`;
+
+        if(result.success){
+            result.data.forEach(emp => {
+                // emp_id illana id ah eduka. adhum illana employee_id
+                const id = emp.emp_id || emp.id || emp.employee_id;
+                const name = emp.name || emp.employee_name;
+
+                if(id && name){
+                    select.innerHTML += `<option value="${id}|${name}">${name} - ${id}</option>`;
+                }
+            });
+        }
+    } catch(err){
+        console.log("Employee Load Error:", err);
+        showToast("Failed to load employees", 'error');
+    }
+}
+
+// Leave table load with date format
+async function loadLeaves() {
+    try {
+        const res = await fetch(`${API_URL}/leaves`);
+        const result = await res.json();
+        if(result.success){
+            const tbody = document.getElementById("leaveTable");
+            tbody.innerHTML = "";
+            result.data.forEach(leave => {
+                tbody.innerHTML += `
+                <tr class="hover:bg-slate-50">
+                    <td class="px-6 py-4">${leave.employee_id}</td>
+                    <td class="px-6 py-4 font-medium">${leave.employee_name}</td>
+                    <td class="px-6 py-4">${leave.leave_type}</td>
+                    <td class="px-6 py-4">${formatDate(leave.from_date)}</td>
+                    <td class="px-6 py-4">${formatDate(leave.to_date)}</td>
+                    <td class="px-6 py-4"><span class="px-3 py-1 rounded-full text-sm font-medium ${leave.status=='Approved'?'bg-green-100 text-green-700':leave.status=='Rejected'?'bg-red-100 text-red-700':'bg-yellow-100 text-yellow-700'}">${leave.status}</span></td>
+                </tr>`;
+            });
+        }
+    } catch(err){
+        console.log("Load Error:", err);
+    }
+}
+
+document.getElementById("leaveForm").addEventListener("submit", async function(e){
+    e.preventDefault();
+
+    const empValue = document.getElementById("leaveEmp").value;
+
+    if(!empValue){
+        showToast("Please select employee from list", 'error');
+        return;
+    }
+
+    const [emp_id, name] = empValue.split('|');
+
+    const fromDate = document.getElementById("fromDate").value;
+    const toDate = document.getElementById("toDate").value;
+
+    if(new Date(fromDate) > new Date(toDate)){
+        showToast("From Date cannot be after To Date", 'error');
+        return;
+    }
+
+    const leaveData = {
+        employee_id: emp_id,
+        employee_name: name,
+        leave_type: document.getElementById("leaveType").value,
+        from_date: fromDate,
+        to_date: toDate,
+        reason: document.getElementById("reason").value,
+        status: "Pending"
+    };
+
+    const res = await fetch(`${API_URL}/leaves`, {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(leaveData)
+    });
+
+    const result = await res.json();
+    if(result.success){
+        showToast(result.message, 'success');
+        closeLeaveModal();
+        loadLeaves();
+    } else {
+        showToast(result.message, 'error');
+    }
+});
+
+window.onload = function() {
+    document.getElementById("userName").textContent = user.name || "Admin";
+    loadLeaves();
+    loadEmployeesForDropdown();
+}
+  </script>
+</body>
+</html>

@@ -1,0 +1,44 @@
+const API_URL = "http://localhost:5000/api";
+
+async function loadNotifications() {
+    const notificationList = document.getElementById("notificationList");
+    
+    try {
+        const res = await fetch(`${API_URL}/notifications`);
+        const result = await res.json();
+
+        notificationList.innerHTML = ""; // loading ah clear pannu
+
+        if(result.success && result.data.length > 0){
+            result.data.forEach(noti => {
+                
+                // type ku etha mari color
+                let color = "bg-indigo-100";
+                if(noti.type === "leave") color = "bg-green-100";
+                if(noti.type === "salary") color = "bg-yellow-100";
+                if(noti.type === "meeting") color = "bg-red-100";
+
+                const li = document.createElement("li");
+                li.className = `${color} p-4 rounded mb-3 flex justify-between`;
+                
+                // Date format pannradhu
+                let time = new Date(noti.created_at).toLocaleString('en-IN');
+
+                li.innerHTML = `
+                    <span>✔ ${noti.message}</span>
+                    <span class="text-xs text-gray-500">${time}</span>
+                `;
+                notificationList.appendChild(li);
+            });
+        } else {
+            notificationList.innerHTML = `<li class="text-center text-gray-500 p-4">No new notifications</li>`;
+        }
+
+    } catch(err){
+        console.log("Notification Load Error:", err);
+        notificationList.innerHTML = `<li class="text-center text-red-500 p-4">Failed to load notifications</li>`;
+    }
+}
+
+// page load aagumbodhe run aagum
+window.onload = loadNotifications;

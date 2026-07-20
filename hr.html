@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EMS - Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50">
+  <script>
+    if(localStorage.getItem('ems_auth') !== 'true') {
+      window.location.href = 'index.html';
+    }
+    const user = JSON.parse(localStorage.getItem('ems_user') || '{}');
+  </script>
+  
+  <div class="flex min-h-screen">
+    <!-- Sidebar -->
+    <div class="w-64 bg-slate-900 fixed h-full">
+       <div class="p-6 border-b border-slate-700 text-center">
+
+  <img src="images/logo.jpeg"
+       alt="EMS Logo"
+       class="w-20 h-20 mx-auto rounded-full bg-white p-2">
+
+  <h2 class="text-2xl font-bold text-white mt-3">
+    EMS
+  </h2>
+
+  <p class="text-slate-400 text-sm">
+    Employee Management System
+  </p>
+
+</div>
+      <nav class="p-4 space-y-2">
+        <a href="dashboard.html" class="flex items-center gap-3 px-4 py-3 rounded-xl bg-indigo-600 text-white">📊 Dashboard</a>
+        <a href="attendance.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-slate-800">⏰ Attendance</a>
+        <a href="leave.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-slate-800">📅 Leave</a>
+        <button onclick="logout()" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-400 hover:bg-slate-800 mt-8">🚪 Logout</button>
+      </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-1 ml-64">
+      <div class="topbar px-8 py-4 bg-white shadow-sm flex justify-between items-center">
+        <h2 class="text-2xl font-bold text-slate-800">Dashboard</h2>
+        <span class="text-slate-600">Welcome, <span id="userName">Admin</span></span>
+      </div>
+      
+      <div class="p-8">
+        <h1 class="text-3xl font-bold text-slate-800 mb-8">Dashboard Overview</h1>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
+          <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-6 text-white shadow-lg hover:scale-105 transition">
+            <p class="text-white/80 text-sm mb-1">Total Employees</p>
+            <h3 id="totalEmployees" class="text-4xl font-bold">0</h3>
+          </div>
+          <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-2xl p-6 text-white shadow-lg hover:scale-105 transition">
+            <p class="text-white/80 text-sm mb-1">Present Today</p>
+            <h3 id="presentToday" class="text-4xl font-bold">0</h3>
+          </div>
+          <div class="bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-2xl p-6 text-white shadow-lg hover:scale-105 transition">
+            <p class="text-white/80 text-sm mb-1">On Leave</p>
+            <h3 id="onLeave" class="text-4xl font-bold">0</h3>
+          </div>
+          <div class="bg-gradient-to-br from-red-500 to-red-600 rounded-2xl p-6 text-white shadow-lg hover:scale-105 transition">
+            <p class="text-white/80 text-sm mb-1">Absent</p>
+            <h3 id="absentToday" class="text-4xl font-bold">0</h3>
+          </div>
+        </div>
+
+        <!-- Table -->
+        <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+          <div class="p-6 border-b border-slate-200">
+            <h2 class="text-xl font-bold text-slate-800">Today's Attendance</h2>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead class="bg-slate-50">
+                <tr>
+                  <th class="px-6 py-4 text-left text-sm font-semibold text-slate-600">Emp ID</th>
+                  <th class="px-6 py-4 text-left text-sm font-semibold text-slate-600">Name</th>
+                  <th class="px-6 py-4 text-left text-sm font-semibold text-slate-600">Department</th>
+                  <th class="px-6 py-4 text-left text-sm font-semibold text-slate-600">Check In</th>
+                  <th class="px-6 py-4 text-left text-sm font-semibold text-slate-600">Status</th>
+                </tr>
+              </thead>
+              <tbody id="attendanceTable" class="divide-y divide-slate-200">
+</tbody>
+                <tr class="hover:bg-slate-50">
+                  <td class="px-6 py-4"><span class="bg-slate-200 text-slate-700 px-3 py-1 rounded-full text-sm">EMP001</span></td>
+                  <td class="px-6 py-4 font-medium">Raj Kumar</td>
+                  <td class="px-6 py-4 text-slate-600">IT</td>
+                  <td class="px-6 py-4">09:00 AM</td>
+                  <td class="px-6 py-4"><span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm">Present</span></td>
+                </tr>
+                <tr class="hover:bg-slate-50">
+                  <td class="px-6 py-4"><span class="bg-slate-200 text-slate-700 px-3 py-1 rounded-full text-sm">EMP002</span></td>
+                  <td class="px-6 py-4 font-medium">Priya S</td>
+                  <td class="px-6 py-4 text-slate-600">HR</td>
+                  <td class="px-6 py-4">-</td>
+                  <td class="px-6 py-4"><span class="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-sm">Leave</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+ <script>
+document.getElementById("userName").textContent = user.name || "Admin";
+
+function logout() {
+    localStorage.removeItem("ems_auth");
+    localStorage.removeItem("ems_user");
+    window.location.href = "index.html";
+}
+
+async function loadDashboard() {
+
+    try {
+
+        const response = await fetch("http://localhost:5000/api/dashboard");
+        const result = await response.json();
+
+        // Dashboard Cards
+        document.getElementById("totalEmployees").textContent =
+            result.data.overview.totalEmployees;
+
+        document.getElementById("presentToday").textContent =
+            result.data.overview.presentToday;
+
+        document.getElementById("onLeave").textContent =
+            result.data.overview.onLeave;
+
+        document.getElementById("absentToday").textContent =
+            result.data.overview.absent;
+
+        // Attendance Table
+        const tbody = document.getElementById("attendanceTable");
+        tbody.innerHTML = "";
+
+        result.data.attendance.forEach(emp => {
+
+            let badge = "";
+
+            if (emp.status === "Present") {
+                badge = "bg-green-100 text-green-700";
+            } else if (emp.status === "Leave") {
+                badge = "bg-yellow-100 text-yellow-700";
+            } else {
+                badge = "bg-red-100 text-red-700";
+            }
+
+            tbody.innerHTML += `
+                <tr class="hover:bg-slate-50">
+                    <td class="px-6 py-4">
+                        <span class="bg-slate-200 text-slate-700 px-3 py-1 rounded-full text-sm">
+                            ${emp.emp_id}
+                        </span>
+                    </td>
+
+                    <td class="px-6 py-4 font-medium">
+                        ${emp.name}
+                    </td>
+
+                    <td class="px-6 py-4 text-slate-600">
+                        ${emp.department}
+                    </td>
+
+                    <td class="px-6 py-4">
+                        ${emp.check_in || "-"}
+                    </td>
+
+                    <td class="px-6 py-4">
+                        <span class="${badge} px-3 py-1 rounded-full text-sm">
+                            ${emp.status}
+                        </span>
+                    </td>
+                </tr>
+            `;
+        });
+
+    } catch (error) {
+        console.log(error);
+    }
+
+}
+
+loadDashboard();
+</script>
+</body>
+</html>

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Payment Management</title>
+
+<link rel="stylesheet" href="css/style.css">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial, sans-serif;
+}
+
+body{
+background:#f4f7fc;
+}
+
+.container{
+width:90%;
+max-width:900px;
+margin:30px auto;
+background:#fff;
+padding:20px;
+border-radius:10px;
+box-shadow:0 5px 15px rgba(0,0,0,.2);
+}
+
+h2{
+text-align:center;
+margin-bottom:20px;
+color:#0d47a1;
+}
+
+input,select{
+width:100%;
+padding:10px;
+margin:8px 0;
+border:1px solid #ccc;
+border-radius:5px;
+}
+
+button{
+width:100%;
+padding:12px;
+background:#0d47a1;
+color:white;
+border:none;
+border-radius:5px;
+cursor:pointer;
+font-size:16px;
+}
+
+button:hover{
+background:#1565c0;
+}
+
+table{
+width:100%;
+margin-top:20px;
+border-collapse:collapse;
+}
+
+table th,table td{
+border:1px solid #ddd;
+padding:10px;
+text-align:center;
+}
+
+table th{
+background:#0d47a1;
+color:white;
+}
+</style>
+
+</head>
+<body>
+   <div class="text-center mt-6 mb-6">
+
+    <img src="images/logo.jpeg"
+         alt="EMS Logo"
+         class="w-24 h-24 mx-auto rounded-full shadow-lg">
+
+    <h1 class="text-4xl font-bold text-indigo-700 mt-3">
+        Employee Management System
+    </h1>
+
+</div>
+<div class="container">
+
+<h2>Employee Payment</h2>
+
+<input type="text" id="name" placeholder="Employee Name">
+
+<input type="text" id="id" placeholder="Employee ID">
+
+<input type="number" id="salary" placeholder="Salary">
+
+<input type="number" id="bonus" placeholder="Bonus">
+
+<input type="number" id="deduction" placeholder="Deduction">
+
+<select id="status">
+<option>Paid</option>
+<option>Pending</option>
+</select>
+
+<button onclick="addPayment()">Save Payment</button>
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>Name</th>
+
+<th>ID</th>
+
+<th>Salary</th>
+
+<th>Bonus</th>
+
+<th>Deduction</th>
+
+<th>Total</th>
+
+<th>Status</th>
+
+<th>Action</th>
+
+</tr>
+
+</thead>
+
+<tbody id="paymentTable">
+
+</tbody>
+
+</table>
+
+</div>
+
+<script src="js/payment.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,104 @@
+const API = "http://localhost:5000/api/payments";
+
+// Load Payments from Database
+async function loadPayments() {
+    try {
+        const res = await fetch(API);
+        const result = await res.json();
+
+        const table = document.getElementById("paymentTable");
+        table.innerHTML = "";
+
+        if (result.success) {
+            result.data.forEach((p) => {
+                table.innerHTML += `
+                <tr>
+                    <td>${p.name}</td>
+                    <td>${p.emp_id}</td>
+                    <td>${p.salary}</td>
+                    <td>${p.bonus}</td>
+                    <td>${p.deduction}</td>
+                    <td>${p.total}</td>
+                    <td>${p.status}</td>
+                    <td>
+                        <button onclick="deletePayment(${p.id})">Delete</button>
+                    </td>
+                </tr>`;
+            });
+        }
+    } catch (err) {
+        console.log("Load Error:", err);
+    }
+}
+
+// Save Payment
+async function addPayment() {
+
+    const name = document.getElementById("name").value;
+    const emp_id = document.getElementById("id").value;
+    const salary = parseFloat(document.getElementById("salary").value);
+    const bonus = parseFloat(document.getElementById("bonus").value) || 0;
+    const deduction = parseFloat(document.getElementById("deduction").value) || 0;
+    const status = document.getElementById("status").value;
+
+    if (!name || !emp_id || isNaN(salary)) {
+        alert("Fill all fields");
+        return;
+    }
+
+    const total = salary + bonus - deduction;
+
+    try {
+
+        const res = await fetch(API, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                name,
+                emp_id,
+                salary,
+                bonus,
+                deduction,
+                total,
+                status
+            })
+        });
+
+        const result = await res.json();
+
+        if (result.success) {
+
+
+            document.getElementById("name").value = "";
+            document.getElementById("id").value = "";
+            document.getElementById("salary").value = "";
+            document.getElementById("bonus").value = "";
+            document.getElementById("deduction").value = "";
+            document.getElementById("status").value = "Paid";
+
+            loadPayments();
+
+        } else {
+            alert(result.message);
+        }
+
+    } catch (err) {
+        console.log("Save Error:", err);
+    }
+}
+
+// Delete Payment
+async function deletePayment(id) {
+
+    if (!confirm("Delete Payment?")) return;
+
+    await fetch(`${API}/${id}`, {
+        method: "DELETE"
+    });
+
+    loadPayments();
+}
+
+window.onload = loadPayments;
